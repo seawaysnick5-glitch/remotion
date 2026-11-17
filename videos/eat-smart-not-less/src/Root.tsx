@@ -16,7 +16,7 @@ export const RemotionRoot: React.FC = () => {
 			defaultProps={
 				{
 					voiceoverSrc: 'voiceover.wav',
-					musicSrc: null,
+					musicSrc: 'music.wav',
 				} satisfies EatSmartNotLessProps
 			}
 		/>

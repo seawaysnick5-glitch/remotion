@@ -11,8 +11,9 @@ npm run render   # เรนเดอร์ไป out/eat-smart-not-less.mp4
 
 ## เสียง
 - `public/voiceover-original.mp3` ไฟล์พากย์ต้นฉบับ (ElevenLabs)
-- `public/voiceover.wav` เร่ง 1.12 เท่า: `ffmpeg -i public/voiceover-original.mp3 -af atempo=1.12 -ar 48000 public/voiceover.wav`
+- `public/voiceover.wav` เร่ง 1.12 เท่า: `ffmpeg -i public/voiceover-original.mp3 -af "atempo=1.12,loudnorm=I=-16:TP=-1.5:LRA=11" -ar 48000 public/voiceover.wav`
 - `public/sfx/` เสียงเอฟเฟกต์ที่สังเคราะห์เอง สร้างใหม่ด้วย `python3 scripts/make-sfx.py`
+- `public/music.wav` เพลงประกอบ EDM 124 BPM แต่งเองด้วยโค้ด (มี drop ตอนเข้าฉากโค้ช TAI) สร้างใหม่ด้วย `python3 scripts/make-music.py` ความดังปรับที่ `volume` ใน `src/Video.tsx`
 
 ## ปรับจังหวะ
 เวลาทั้งหมดอยู่ใน `src/timing.ts` เป็นวินาทีของไฟล์ต้นฉบับ (ฟังใน player ทั่วไปแล้วแก้ตัวเลขได้เลย)

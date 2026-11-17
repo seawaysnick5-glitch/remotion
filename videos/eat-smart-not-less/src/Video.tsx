@@ -41,7 +41,7 @@ export const EatSmartNotLess: React.FC<EatSmartNotLessProps> = ({voiceoverSrc, m
 			</Series>
 
 			{voiceoverSrc ? <Audio src={staticFile(voiceoverSrc)} /> : null}
-			{musicSrc ? <Audio src={staticFile(musicSrc)} volume={0.18} /> : null}
+			{musicSrc ? <Audio src={staticFile(musicSrc)} volume={0.3} /> : null}
 		</AbsoluteFill>
 	);
 };
