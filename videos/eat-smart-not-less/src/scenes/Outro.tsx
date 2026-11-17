@@ -1,5 +1,5 @@
 import React from 'react';
-import {AbsoluteFill, interpolate, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame} from 'remotion';
 import {Caption} from '../components/Caption';
 import {Sfx} from '../components/Sfx';
 import {at, CAPTIONS, SCENE_FRAMES} from '../timing';
@@ -112,6 +112,9 @@ export const Outro: React.FC = () => {
 	const len = SCENE_FRAMES.outro;
 	const qIn = pop(frame, T.question, 10);
 	const qOut = interpolate(frame, [T.card - 8, T.card + 2], [1, 0], clamp);
+	const coachIn = pop(frame, T.question + 4, 13);
+	const tagIn = pop(frame, T.question + 16, 10);
+	const hostIn = pop(frame, T.card + 10, 11);
 
 	// phase B: class card
 	const cardIn = pop(frame, T.card, 11);
@@ -125,7 +128,7 @@ export const Outro: React.FC = () => {
 	const btn2In = pop(frame, T.btn2, 11);
 	const press1 = frame >= T.press1 && frame < T.press1 + 7;
 	const press2 = frame >= T.press2 && frame < T.press2 + 7;
-	const fingerY = interpolate(frame, [T.btn1 + 4, T.press1, T.press1 + 7, T.press2], [1150, 1080, 1080, 1225], clamp);
+	const fingerY = interpolate(frame, [T.btn1 + 4, T.press1, T.press1 + 7, T.press2], [1260, 1190, 1190, 1325], clamp);
 	const fingerX = interpolate(frame, [T.btn1 + 4, T.press1], [400, 0], clamp);
 	const fingerVisible = frame >= T.btn1 + 4 && frame < T.end;
 
@@ -136,25 +139,68 @@ export const Outro: React.FC = () => {
 
 	return (
 		<AbsoluteFill style={{background: C.lime}}>
-			{/* phase A */}
+			{/* phase A: meet coach TAI */}
 			{frame < T.card + 2 ? (
-				<AbsoluteFill style={{alignItems: 'center', justifyContent: 'center', opacity: qOut}}>
+				<AbsoluteFill style={{opacity: qOut, alignItems: 'center'}}>
+					{/* giant name behind the coach */}
 					<div
 						style={{
-							marginTop: -200,
+							position: 'absolute',
+							top: 520,
+							fontFamily: FONT_BRAND,
+							fontSize: 640,
+							lineHeight: 1,
+							color: C.black,
+							transform: `skewX(-10deg) scale(${pop(frame, T.question, 12)})`,
+							letterSpacing: 10,
+						}}
+					>
+						TAI
+					</div>
+					<div
+						style={{
+							marginTop: 260,
 							textAlign: 'center',
 							fontFamily: FONT_TH_ITALIC,
 							fontStyle: 'italic',
 							fontWeight: 900,
-							fontSize: 130,
+							fontSize: 92,
 							lineHeight: 1.2,
 							color: C.black,
 							transform: `scale(${qIn}) rotate(-4deg)`,
+							zIndex: 2,
 						}}
 					>
 						อยากปั้นหุ่น
 						<br />
-						<span style={{background: C.black, color: C.lime, padding: '0 30px', borderRadius: 30}}>แบบยั่งยืน?</span>
+						<span style={{background: C.black, color: C.lime, padding: '0 24px', borderRadius: 24}}>แบบยั่งยืน?</span>
+					</div>
+					<Img
+						src={staticFile('trainer/tai.png')}
+						style={{
+							position: 'absolute',
+							top: 500,
+							height: 1300,
+							transform: `translateY(${(1 - coachIn) * 900}px)`,
+							filter: `drop-shadow(5px 0 0 ${C.white}) drop-shadow(-5px 0 0 ${C.white}) drop-shadow(0 5px 0 ${C.white}) drop-shadow(0 -5px 0 ${C.white}) drop-shadow(16px 16px 0 ${C.black})`,
+						}}
+					/>
+					{/* name tag */}
+					<div
+						style={{
+							position: 'absolute',
+							top: 1130,
+							left: 40,
+							background: C.black,
+							border: `6px solid ${C.white}`,
+							borderRadius: 28,
+							padding: '10px 30px 14px',
+							transform: `scale(${tagIn}) rotate(-6deg)`,
+							transformOrigin: 'left center',
+						}}
+					>
+						<div style={{fontFamily: FONT_TH, fontWeight: 800, fontSize: 40, color: C.white, lineHeight: 1.2}}>พบกับเทรนเนอร์</div>
+						<div style={{fontFamily: FONT_BRAND, fontSize: 110, color: C.lime, lineHeight: 1, transform: 'skewX(-8deg)'}}>TAI</div>
 					</div>
 				</AbsoluteFill>
 			) : null}
@@ -204,7 +250,7 @@ export const Outro: React.FC = () => {
 								textAlign: 'center',
 								fontFamily: FONT_TH,
 								fontWeight: 900,
-								fontSize: 104,
+								fontSize: 92,
 								lineHeight: 1.2,
 								color: C.black,
 								marginTop: 12,
@@ -213,7 +259,36 @@ export const Outro: React.FC = () => {
 							คลาสออนไลน์
 							<div style={{fontSize: 52, fontWeight: 800}}>ปั้นหุ่นแบบยั่งยืน</div>
 						</div>
-						<div style={{display: 'flex', gap: 28, marginTop: 28}}>
+						{/* host */}
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								gap: 20,
+								marginTop: 16,
+								transform: `scale(${hostIn})`,
+							}}
+						>
+							<div
+								style={{
+									width: 112,
+									height: 112,
+									borderRadius: 56,
+									border: `6px solid ${C.black}`,
+									background: `${C.lime} url(${staticFile('trainer/tai.png')}) no-repeat`,
+									backgroundSize: '240%',
+									backgroundPosition: '50% 1%',
+								}}
+							/>
+							<div style={{textAlign: 'left'}}>
+								<div style={{fontFamily: FONT_TH, fontWeight: 700, fontSize: 36, color: C.black, lineHeight: 1.1}}>สอนโดย</div>
+								<div style={{fontFamily: FONT_TH, fontWeight: 900, fontSize: 56, color: C.black, lineHeight: 1.1}}>
+									เทรนเนอร์ <span style={{fontFamily: FONT_BRAND, fontWeight: 400, background: C.black, color: C.lime, padding: '0 14px', borderRadius: 10}}>TAI</span>
+								</div>
+							</div>
+						</div>
+						<div style={{display: 'flex', gap: 28, marginTop: 22}}>
 							<Tile
 								s={dayIn}
 								top="WED"
@@ -268,10 +343,10 @@ export const Outro: React.FC = () => {
 					</div>
 
 					{/* CTA buttons */}
-					<div style={{position: 'absolute', top: 1040}}>
+					<div style={{position: 'absolute', top: 1150}}>
 						<CtaButton label="คลิกลิงก์ลงทะเบียน" icon="link" s={btn1In} pressed={press1} dark />
 					</div>
-					<div style={{position: 'absolute', top: 1190}}>
+					<div style={{position: 'absolute', top: 1290}}>
 						<CtaButton label="ทักแชต จองสิทธิ์ด่วน!" icon="chat" s={btn2In} pressed={press2} dark={false} />
 					</div>
 					{fingerVisible ? (
