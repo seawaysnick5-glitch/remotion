@@ -40,7 +40,7 @@ export const SCENES = {
 	hook: 150,
 	concept: 240,
 	keyPoint: 300,
-	outro: 210,
+	outro: 330,
 };
 
 export const TOTAL_FRAMES =
