@@ -22,14 +22,14 @@ export const Concept: React.FC = () => {
 
 	const t = at.concept;
 	const T = {
-		title: t(7.3), // "ความลับคือ"
-		gauge: t(9.32), // "คุมแคลอรี"
-		plate: t(10.35),
-		protein: t(10.55), // "เน้นโปรตีน"
-		clock: t(11.2), // "อิ่มนาน"
-		veg: t(11.78), // "จัดจานให้ครบหมู่"
-		carb: t(12.12),
-		khai: t(12.55), // "อิ่มได้"
+		title: t(7.35), // "มาเรียนรู้เทคนิค"
+		gauge: t(9.4), // "ทั้งเรื่องแคลอรี"
+		plate: t(10.3),
+		protein: t(10.55), // "โปรตีน"
+		clock: t(12.55), // "แบบอิ่มท้อง"
+		veg: t(11.4), // "จัดมื้ออาหาร"
+		carb: t(11.85),
+		khai: t(13.42), // "ไม่ต้องทรมาน"
 	};
 	const titleIn = pop(frame, T.title, 10);
 	const gaugeIn = pop(frame, T.gauge, 12);
@@ -183,7 +183,7 @@ export const Concept: React.FC = () => {
 					<circle r={21} fill="none" stroke={C.lime} strokeWidth={5} />
 					<path d={`M 0 0 L 0 -13 M 0 0 L ${Math.cos(frame * 0.3) * 11} ${Math.sin(frame * 0.3) * 11}`} stroke={C.lime} strokeWidth={5} strokeLinecap="round" />
 				</svg>
-				อิ่มนาน
+				อิ่มท้อง
 			</div>
 
 			{/* Nong Khai lets go of the fat */}

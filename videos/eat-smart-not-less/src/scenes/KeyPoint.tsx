@@ -27,15 +27,16 @@ export const KeyPoint: React.FC = () => {
 	// part A: one big scale drops 72 -> 68
 	const t = at.keyPoint;
 	const T = {
-		headline: t(14.95), // "ที่สำคัญ"
-		drop: t(15.3), // "อย่าดูแค่ตัวเลข"
-		goodNews: t(16.05),
-		split: t(16.6), // "เพราะลดน้ำหนัก"
-		muscleLoss: t(17.4), // "อาจเสียกล้ามเนื้อ"
-		soft: t(18.3), // "จนตัวนิ่ม"
-		fatLoss: t(19.3), // "แต่ลดไขมัน"
-		firm: t(19.85), // "เฟิร์ม"
-		win: t(20.24), // "และลีนขึ้นจริง"
+		headline: t(14.95), // "พร้อมเคลียร์ชัดๆ ว่า"
+		drop: t(15.1),
+		goodNews: t(15.8),
+		split: t(16.3),
+		fatLoss: t(16.47), // "ลดไขมัน"
+		firm: t(16.95),
+		muscleLoss: t(17.78), // "ลดน้ำหนัก"
+		soft: t(18.05),
+		question: t(18.33), // "ยังไง..."
+
 	};
 	const weight = interpolate(frame, [T.drop, T.goodNews], [72, 68], clamp);
 	const bigScaleIn = pop(frame, 0, 11);
@@ -50,8 +51,9 @@ export const KeyPoint: React.FC = () => {
 	const softTag = pop(frame, T.soft, 9);
 	const firmTag = pop(frame, T.firm, 9);
 
-	// part C: right side wins
-	const win = interpolate(frame, [T.win, T.win + 10], [0, 1], clamp);
+	// part C: the open question (answered in the class)
+	const win = 0;
+	const qMark = pop(frame, T.question, 8);
 
 	const panel = (side: 'left' | 'right') => {
 		const isLeft = side === 'left';
@@ -141,12 +143,12 @@ export const KeyPoint: React.FC = () => {
 							fontFamily: FONT_TH_ITALIC,
 							fontStyle: 'italic',
 							fontWeight: 900,
-							fontSize: 96,
+							fontSize: 84,
 							color: C.lime,
 							transform: `scale(${pop(frame, T.headline, 10)})`,
 						}}
 					>
-						อย่าดูแค่ตาชั่ง!
+						ลดไขมัน ≠ ลดน้ำหนัก
 					</div>
 					<div style={{marginTop: 60, transform: `scale(${bigScaleIn})`}}>
 						<Scale value={weight.toFixed(1)} width={760} />
@@ -181,17 +183,17 @@ export const KeyPoint: React.FC = () => {
 							width: 120,
 							height: 120,
 							borderRadius: 60,
-							background: C.white,
 							border: `8px solid ${C.black}`,
 							fontFamily: FONT_BRAND,
 							fontSize: 60,
 							lineHeight: '104px',
 							textAlign: 'center',
 							color: C.black,
-							transform: `scale(${pop(frame, T.split + 8, 10) * (1 - win)})`,
+							transform: `scale(${pop(frame, T.split + 8, 10) * (1 + qMark * 0.35)}) rotate(${qMark * 360}deg)`,
+							background: qMark > 0.5 ? C.lime : C.white,
 						}}
 					>
-						VS
+						{qMark > 0.5 ? '?' : 'VS'}
 					</div>
 				</>
 			) : null}
@@ -208,7 +210,7 @@ export const KeyPoint: React.FC = () => {
 			<Sfx at={T.soft} name="boing" volume={0.65} />
 			<Sfx at={T.firm} name="pop" volume={0.55} />
 			<Sfx at={T.firm + 2} name="sparkle" volume={0.45} />
-			<Sfx at={T.win} name="ding" volume={0.45} />
+			<Sfx at={T.question} name="boing" volume={0.5} />
 		</AbsoluteFill>
 	);
 };

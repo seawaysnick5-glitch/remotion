@@ -22,7 +22,7 @@ export const Hook: React.FC = () => {
 		cross: t(0.4),
 		foodsGone: t(1.9), // "...อดอาหาร"
 		plateOut: t(3.1),
-		khai: t(3.62), // "ยิ่งอด"
+		khai: t(3.62), // "ยิ่งอด..."
 		warning: t(5.3), // "หวง"
 	};
 	const foodStagger = t(0.18);
