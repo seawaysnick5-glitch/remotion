@@ -1,6 +1,8 @@
 import React from 'react';
 import {AbsoluteFill, Easing, interpolate, useCurrentFrame} from 'remotion';
 import {Caption} from '../components/Caption';
+import {Sfx} from '../components/Sfx';
+import {at, CAPTIONS} from '../timing';
 import {NongKhai} from '../components/NongKhai';
 import {C, FONT_TH, FONT_TH_ITALIC, pop} from '../theme';
 
@@ -18,20 +20,31 @@ const wedge = (r: number, a0: number, a1: number) => {
 export const Concept: React.FC = () => {
 	const frame = useCurrentFrame();
 
-	const titleIn = pop(frame, 0, 10);
-	const gaugeIn = pop(frame, 36, 12);
+	const t = at.concept;
+	const T = {
+		title: t(7.3), // "ความลับคือ"
+		gauge: t(9.32), // "คุมแคลอรี"
+		plate: t(10.35),
+		protein: t(10.55), // "เน้นโปรตีน"
+		clock: t(11.2), // "อิ่มนาน"
+		veg: t(11.78), // "จัดจานให้ครบหมู่"
+		carb: t(12.12),
+		khai: t(12.55), // "อิ่มได้"
+	};
+	const titleIn = pop(frame, T.title, 10);
+	const gaugeIn = pop(frame, T.gauge, 12);
 	// needle swings past, then settles in the green "just right" zone
-	const needle = interpolate(frame, [44, 58, 68, 78], [-85, 60, -14, 0], {
+	const needle = interpolate(frame, [T.gauge + 4, T.gauge + 13, T.gauge + 19, T.gauge + 25], [-85, 60, -14, 0], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 		easing: Easing.out(Easing.quad),
 	});
-	const plateIn = pop(frame, 70, 12);
-	const protein = pop(frame, 88, 10);
-	const veg = pop(frame, 132, 10);
-	const carb = pop(frame, 150, 10);
-	const clockIn = pop(frame, 100, 10);
-	const khaiIn = pop(frame, 176, 10);
+	const plateIn = pop(frame, T.plate, 12);
+	const protein = pop(frame, T.protein, 10);
+	const veg = pop(frame, T.veg, 10);
+	const carb = pop(frame, T.carb, 10);
+	const clockIn = pop(frame, T.clock, 10);
+	const khaiIn = pop(frame, T.khai, 10);
 
 	const R = 270;
 	return (
@@ -182,19 +195,22 @@ export const Concept: React.FC = () => {
 					transform: `scale(${khaiIn}) rotate(${(1 - khaiIn) * -30}deg)`,
 				}}
 			>
-				{frame >= 170 ? <NongKhai mood="happy" size={260} holdingBag={false} /> : null}
+				{frame >= T.khai - 2 ? <NongKhai mood="happy" size={260} holdingBag={false} /> : null}
 			</div>
 
-			<Caption
-				y={1400}
-				segments={[
-					{from: 0, to: 40, text: 'ความลับคือ กินให้*ฉลาด*ครับ'},
-					{from: 40, to: 86, text: 'คุม*แคลอรี*ให้พอดี'},
-					{from: 86, to: 130, text: 'เน้น*โปรตีน* อิ่มนาน'},
-					{from: 130, to: 176, text: 'จัดจานให้*ครบหมู่*'},
-					{from: 176, to: 240, text: 'อิ่มได้... *ไม่ต้องทนหิว!*'},
-				]}
-			/>
+			<Caption cues={CAPTIONS.concept} toFrame={t} y={1400} />
+
+			<Sfx at={T.title} name="pop" volume={0.55} />
+			<Sfx at={T.gauge} name="pop" volume={0.5} />
+			<Sfx at={T.gauge + 4} name="whoosh" volume={0.35} />
+			<Sfx at={T.gauge + 25} name="ding" volume={0.45} />
+			<Sfx at={T.plate} name="pop" volume={0.45} />
+			<Sfx at={T.protein} name="pop" volume={0.55} />
+			<Sfx at={T.clock} name="click" volume={0.5} />
+			<Sfx at={T.veg} name="pop" volume={0.55} />
+			<Sfx at={T.carb} name="pop" volume={0.55} />
+			<Sfx at={T.khai} name="boing" volume={0.5} />
+			<Sfx at={T.khai + 4} name="sparkle" volume={0.35} />
 		</AbsoluteFill>
 	);
 };

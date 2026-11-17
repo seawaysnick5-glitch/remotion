@@ -5,7 +5,7 @@ import {Concept} from './scenes/Concept';
 import {Hook} from './scenes/Hook';
 import {KeyPoint} from './scenes/KeyPoint';
 import {Outro} from './scenes/Outro';
-import {SCENES} from './theme';
+import {SCENE_FRAMES as SCENES} from './timing';
 
 export type EatSmartNotLessProps = {
 	// File names inside public/, e.g. "voiceover.wav"

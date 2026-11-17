@@ -35,17 +35,6 @@ export const C = {
 
 export const FPS = 30;
 
-// Scene lengths in frames (30fps). Adjust to the real voiceover later.
-export const SCENES = {
-	hook: 150,
-	concept: 240,
-	keyPoint: 300,
-	outro: 330,
-};
-
-export const TOTAL_FRAMES =
-	SCENES.hook + SCENES.concept + SCENES.keyPoint + SCENES.outro;
-
 export const pop = (frame: number, delay: number, damping = 11) =>
 	spring({
 		frame: frame - delay,

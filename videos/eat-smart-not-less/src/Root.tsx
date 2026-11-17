@@ -1,7 +1,8 @@
 import React from 'react';
 import {Composition} from 'remotion';
 import {EatSmartNotLess, EatSmartNotLessProps} from './Video';
-import {FPS, TOTAL_FRAMES} from './theme';
+import {FPS} from './theme';
+import {TOTAL_FRAMES} from './timing';
 
 export const RemotionRoot: React.FC = () => {
 	return (
@@ -14,7 +15,7 @@ export const RemotionRoot: React.FC = () => {
 			height={1920}
 			defaultProps={
 				{
-					voiceoverSrc: null,
+					voiceoverSrc: 'voiceover.wav',
 					musicSrc: null,
 				} satisfies EatSmartNotLessProps
 			}

@@ -2,6 +2,8 @@ import React from 'react';
 import {AbsoluteFill, interpolate, useCurrentFrame} from 'remotion';
 import {BodyFigure} from '../components/BodyFigure';
 import {Caption} from '../components/Caption';
+import {Sfx} from '../components/Sfx';
+import {at, CAPTIONS} from '../timing';
 import {Scale} from '../components/Scale';
 import {C, FONT_BRAND, FONT_TH, FONT_TH_ITALIC, pop} from '../theme';
 
@@ -23,22 +25,33 @@ export const KeyPoint: React.FC = () => {
 	const frame = useCurrentFrame();
 
 	// part A: one big scale drops 72 -> 68
-	const weight = interpolate(frame, [18, 60], [72, 68], clamp);
+	const t = at.keyPoint;
+	const T = {
+		headline: t(14.95), // "ที่สำคัญ"
+		drop: t(15.3), // "อย่าดูแค่ตัวเลข"
+		goodNews: t(16.05),
+		split: t(16.6), // "เพราะลดน้ำหนัก"
+		muscleLoss: t(17.4), // "อาจเสียกล้ามเนื้อ"
+		soft: t(18.3), // "จนตัวนิ่ม"
+		fatLoss: t(19.3), // "แต่ลดไขมัน"
+		firm: t(19.85), // "เฟิร์ม"
+		win: t(20.24), // "และลีนขึ้นจริง"
+	};
+	const weight = interpolate(frame, [T.drop, T.goodNews], [72, 68], clamp);
 	const bigScaleIn = pop(frame, 0, 11);
-	const splitT = interpolate(frame, [72, 86], [0, 1], clamp);
+	const splitT = interpolate(frame, [T.split - 2, T.split + 10], [0, 1], clamp);
 
 	// part B: split comparison
-	const leftIn = pop(frame, 78, 12);
-	const rightIn = pop(frame, 84, 12);
-	const leftMuscle = interpolate(frame, [110, 140], [100, 55], clamp);
-	const leftFat = interpolate(frame, [110, 140], [100, 85], clamp);
-	const rightFat = interpolate(frame, [165, 195], [100, 45], clamp);
-	const softTag = pop(frame, 140, 9);
-	const firmTag = pop(frame, 192, 9);
+	const leftIn = pop(frame, T.split, 12);
+	const rightIn = pop(frame, T.split + 4, 12);
+	const leftMuscle = interpolate(frame, [T.muscleLoss, T.soft], [100, 55], clamp);
+	const leftFat = interpolate(frame, [T.muscleLoss, T.soft], [100, 85], clamp);
+	const rightFat = interpolate(frame, [T.fatLoss, T.firm + 6], [100, 45], clamp);
+	const softTag = pop(frame, T.soft, 9);
+	const firmTag = pop(frame, T.firm, 9);
 
 	// part C: right side wins
-	const win = interpolate(frame, [238, 256], [0, 1], clamp);
-	const punchIn = pop(frame, 244, 10);
+	const win = interpolate(frame, [T.win, T.win + 10], [0, 1], clamp);
 
 	const panel = (side: 'left' | 'right') => {
 		const isLeft = side === 'left';
@@ -88,7 +101,7 @@ export const KeyPoint: React.FC = () => {
 					-4 KG
 				</div>
 				<div style={{marginTop: 18, position: 'relative'}}>
-					<BodyFigure variant={isLeft ? 'soft' : 'firm'} height={480} wobbleFrom={140} />
+					<BodyFigure variant={isLeft ? 'soft' : 'firm'} height={480} wobbleFrom={T.soft} />
 					<div
 						style={{
 							position: 'absolute',
@@ -130,7 +143,7 @@ export const KeyPoint: React.FC = () => {
 							fontWeight: 900,
 							fontSize: 96,
 							color: C.lime,
-							transform: `scale(${pop(frame, 4, 10)})`,
+							transform: `scale(${pop(frame, T.headline, 10)})`,
 						}}
 					>
 						อย่าดูแค่ตาชั่ง!
@@ -138,7 +151,7 @@ export const KeyPoint: React.FC = () => {
 					<div style={{marginTop: 60, transform: `scale(${bigScaleIn})`}}>
 						<Scale value={weight.toFixed(1)} width={760} />
 					</div>
-					{frame > 60 ? (
+					{frame >= T.goodNews ? (
 						<div
 							style={{
 								marginTop: 30,
@@ -146,7 +159,7 @@ export const KeyPoint: React.FC = () => {
 								fontWeight: 900,
 								fontSize: 64,
 								color: C.white,
-								transform: `scale(${pop(frame, 60, 9)})`,
+								transform: `scale(${pop(frame, T.goodNews, 9)})`,
 							}}
 						>
 							-4 kg ข่าวดี...?
@@ -156,7 +169,7 @@ export const KeyPoint: React.FC = () => {
 			) : null}
 
 			{/* part B */}
-			{frame >= 74 ? (
+			{frame >= T.split - 2 ? (
 				<>
 					{panel('left')}
 					{panel('right')}
@@ -175,7 +188,7 @@ export const KeyPoint: React.FC = () => {
 							lineHeight: '104px',
 							textAlign: 'center',
 							color: C.black,
-							transform: `scale(${pop(frame, 92, 10) * (1 - win)})`,
+							transform: `scale(${pop(frame, T.split + 8, 10) * (1 - win)})`,
 						}}
 					>
 						VS
@@ -183,44 +196,19 @@ export const KeyPoint: React.FC = () => {
 				</>
 			) : null}
 
-			{/* part C punchline */}
-			{frame >= 240 ? (
-				<div
-					style={{
-						position: 'absolute',
-						top: 560,
-						left: 60,
-						right: 60,
-						background: C.lime,
-						border: `8px solid ${C.black}`,
-						boxShadow: `14px 14px 0 ${C.white}`,
-						borderRadius: 36,
-						padding: '26px 20px',
-						textAlign: 'center',
-						fontFamily: FONT_TH,
-						fontWeight: 900,
-						fontSize: 70,
-						lineHeight: 1.25,
-						color: C.black,
-						transform: `scale(${punchIn}) rotate(-3deg)`,
-					}}
-				>
-					ไม่ใช่แค่ "เบาลง"
-					<br />
-					แต่ต้อง "ดีขึ้น"
-				</div>
-			) : null}
+			<Caption cues={CAPTIONS.keyPoint} toFrame={t} y={1430} />
 
-			<Caption
-				y={1430}
-				segments={[
-					{from: 0, to: 80, text: 'ที่สำคัญ... อย่าดูแค่*ตัวเลข*บนตาชั่งครับ'},
-					{from: 80, to: 142, text: 'เพราะ "ลด*น้ำหนัก*" อาจเสียกล้ามเนื้อ'},
-					{from: 142, to: 172, text: 'จน*ตัวนิ่ม*'},
-					{from: 172, to: 236, text: 'แต่ "ลด*ไขมัน*" คือหุ่นที่*เฟิร์ม*'},
-					{from: 236, to: 300, text: 'และ*ลีน*ขึ้นจริง!'},
-				]}
-			/>
+			<Sfx at={0} name="pop" volume={0.5} />
+			<Sfx at={T.drop} name="click" volume={0.4} />
+			<Sfx at={T.drop + 6} name="click" volume={0.4} />
+			<Sfx at={T.drop + 12} name="click" volume={0.4} />
+			<Sfx at={T.goodNews} name="ding" volume={0.4} />
+			<Sfx at={T.split} name="whoosh" volume={0.55} />
+			<Sfx at={T.split + 8} name="thud" volume={0.4} />
+			<Sfx at={T.soft} name="boing" volume={0.65} />
+			<Sfx at={T.firm} name="pop" volume={0.55} />
+			<Sfx at={T.firm + 2} name="sparkle" volume={0.45} />
+			<Sfx at={T.win} name="ding" volume={0.45} />
 		</AbsoluteFill>
 	);
 };

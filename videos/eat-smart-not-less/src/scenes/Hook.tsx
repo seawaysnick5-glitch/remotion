@@ -1,6 +1,8 @@
 import React from 'react';
 import {AbsoluteFill, interpolate, useCurrentFrame} from 'remotion';
 import {Caption} from '../components/Caption';
+import {Sfx} from '../components/Sfx';
+import {at, CAPTIONS} from '../timing';
 import {NongKhai} from '../components/NongKhai';
 import {C, FONT_TH, FONT_TH_ITALIC, pop} from '../theme';
 
@@ -15,20 +17,29 @@ const FOODS = [
 
 export const Hook: React.FC = () => {
 	const frame = useCurrentFrame();
+	const t = at.hook;
+	const T = {
+		cross: t(0.4),
+		foodsGone: t(1.9), // "...อดอาหาร"
+		plateOut: t(3.1),
+		khai: t(3.62), // "ยิ่งอด"
+		warning: t(5.3), // "หวง"
+	};
+	const foodStagger = t(0.18);
 
 	const plateIn = pop(frame, 0, 10);
-	const crossDraw = interpolate(frame, [14, 26], [0, 1], {
+	const crossDraw = interpolate(frame, [T.cross, T.cross + 10], [0, 1], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 	});
-	const plateOut = interpolate(frame, [76, 88], [0, 1], {
+	const plateOut = interpolate(frame, [T.plateOut, T.plateOut + 10], [0, 1], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 	});
-	const khaiIn = pop(frame, 82, 9);
-	const isPhase2 = frame >= 82;
+	const khaiIn = pop(frame, T.khai, 9);
+	const isPhase2 = frame >= T.khai;
 	const headline = isPhase2 ? 'ยิ่งอด ยิ่ง"หวง"!' : 'อด = ผอม?';
-	const headlinePop = pop(frame, isPhase2 ? 82 : 0, 9);
+	const headlinePop = pop(frame, isPhase2 ? T.khai : 0, 9);
 	const warnBlink = Math.floor(frame / 6) % 2 === 0;
 
 	return (
@@ -68,7 +79,7 @@ export const Hook: React.FC = () => {
 					<circle r={280} fill={C.white} stroke={C.lime} strokeWidth={16} />
 					<circle r={215} fill="none" stroke="#E3E3E3" strokeWidth={8} />
 					{FOODS.map((f, i) => {
-						const gone = pop(frame, 32 + i * 9, 14);
+						const gone = pop(frame, T.foodsGone + i * foodStagger, 14);
 						const s = Math.max(0, 1 - gone);
 						return (
 							<g key={i} transform={`translate(${f.x} ${f.y}) scale(${s})`}>
@@ -88,7 +99,7 @@ export const Hook: React.FC = () => {
 			</div>
 
 			{/* warning banner */}
-			{isPhase2 ? (
+			{frame >= T.warning ? (
 				<div
 					style={{
 						position: 'absolute',
@@ -104,7 +115,7 @@ export const Hook: React.FC = () => {
 						fontWeight: 900,
 						fontSize: 56,
 						textAlign: 'center',
-						transform: `scale(${pop(frame, 90, 12)})`,
+						transform: `scale(${pop(frame, T.warning, 12)})`,
 					}}
 				>
 					⚠ โหมดประหยัดพลังงาน!
@@ -120,17 +131,20 @@ export const Hook: React.FC = () => {
 					transform: `scale(${khaiIn}) translateY(${(1 - khaiIn) * 300}px)`,
 				}}
 			>
-				{frame >= 80 ? <NongKhai mood="greedy" size={600} holdingBag /> : null}
+				{frame >= T.khai - 2 ? <NongKhai mood="greedy" size={600} holdingBag /> : null}
 			</div>
 
-			<Caption
-				y={1340}
-				segments={[
-					{from: 0, to: 58, text: 'ใครบอกว่า ลดไขมัน ต้อง*อด*อาหาร?'},
-					{from: 58, to: 98, text: 'รู้ไหมครับ... *ยิ่งอด*'},
-					{from: 98, to: 150, text: 'ร่างกายยิ่ง *"หวง"* ไขมัน!'},
-				]}
-			/>
+			<Caption cues={CAPTIONS.hook} toFrame={t} y={1340} />
+
+			<Sfx at={0} name="pop" volume={0.6} />
+			<Sfx at={T.cross} name="scratch" volume={0.6} />
+			{FOODS.map((_, i) => (
+				<Sfx key={i} at={T.foodsGone + i * foodStagger} name="pop" volume={0.45} />
+			))}
+			<Sfx at={T.plateOut} name="whoosh" volume={0.5} />
+			<Sfx at={T.khai} name="boing" volume={0.6} />
+			<Sfx at={T.khai + 6} name="sparkle" volume={0.35} />
+			<Sfx at={T.warning} name="alarm" volume={0.4} />
 		</AbsoluteFill>
 	);
 };

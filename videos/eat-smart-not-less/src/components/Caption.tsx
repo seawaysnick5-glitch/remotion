@@ -1,28 +1,33 @@
 import React from 'react';
 import {useCurrentFrame} from 'remotion';
+import {CaptionCue} from '../timing';
+import {Sfx} from './Sfx';
 import {C, FONT_TH, pop} from '../theme';
 
-export type CaptionSegment = {
-	from: number;
-	to: number;
-	// Wrap words in *stars* to highlight them in lime
-	text: string;
-};
 
 // Burned-in subtitles, kept inside the IG Reels safe zone
 // (top 220px / bottom 420px are covered by the Instagram UI).
 export const Caption: React.FC<{
-	segments: CaptionSegment[];
+	cues: CaptionCue[];
+	toFrame: (sec: number) => number;
 	y: number;
-}> = ({segments, y}) => {
+}> = ({cues, toFrame, y}) => {
 	const frame = useCurrentFrame();
+	const segments = cues.map((c, i) => ({
+		from: toFrame(c.start),
+		to: i + 1 < cues.length ? toFrame(cues[i + 1].start) : Infinity,
+		text: c.text,
+	}));
 	const seg = segments.find((s) => frame >= s.from && frame < s.to);
+	const sounds = segments.map((s) => <Sfx key={s.from} at={s.from} name="pop-soft" volume={0.35} />);
 	if (!seg) {
-		return null;
+		return <>{sounds}</>;
 	}
 	const s = pop(frame, seg.from, 14);
 	const parts = seg.text.split('*');
 	return (
+		<>
+		{sounds}
 		<div
 			style={{
 				position: 'absolute',
@@ -57,5 +62,6 @@ export const Caption: React.FC<{
 				))}
 			</div>
 		</div>
+		</>
 	);
 };

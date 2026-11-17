@@ -1,6 +1,8 @@
 import React from 'react';
 import {AbsoluteFill, interpolate, useCurrentFrame} from 'remotion';
 import {Caption} from '../components/Caption';
+import {Sfx} from '../components/Sfx';
+import {at, CAPTIONS, SCENE_FRAMES} from '../timing';
 import {Logo} from '../components/Logo';
 import {NongKhai} from '../components/NongKhai';
 import {C, FONT_BRAND, FONT_TH, FONT_TH_ITALIC, pop} from '../theme';
@@ -94,34 +96,48 @@ export const Outro: React.FC = () => {
 	const frame = useCurrentFrame();
 
 	// phase A: the question
-	const qIn = pop(frame, 0, 10);
-	const qOut = interpolate(frame, [40, 50], [1, 0], clamp);
+	const t = at.outro;
+	const T = {
+		question: t(21.18), // "ใครอยากปั้นหุ่น"
+		card: t(22.94), // "เจอกันในคลาสออนไลน์"
+		day: t(24.3), // "วันพุธนี้"
+		time: t(25.26), // "เวลา 1 ทุ่มตรง"
+		free: t(26.5), // "คลาสนี้ฟรี"
+		btn1: t(27.4), // "รีบคลิกลิงก์"
+		press1: t(27.85),
+		btn2: t(28.42), // "หรือทักแชต"
+		press2: t(28.85),
+		end: t(29.4), // "แล้วเจอกันวันพุธนี้"
+	};
+	const len = SCENE_FRAMES.outro;
+	const qIn = pop(frame, T.question, 10);
+	const qOut = interpolate(frame, [T.card - 8, T.card + 2], [1, 0], clamp);
 
 	// phase B: class card
-	const cardIn = pop(frame, 46, 11);
-	const dayIn = pop(frame, 92, 10);
-	const timeIn = pop(frame, 112, 10);
-	const stamp = interpolate(frame, [150, 158], [3.2, 1], clamp);
-	const shake = frame >= 158 && frame < 170 ? Math.sin(frame * 3) * 8 : 0;
+	const cardIn = pop(frame, T.card, 11);
+	const dayIn = pop(frame, T.day, 10);
+	const timeIn = pop(frame, T.time, 10);
+	const stamp = interpolate(frame, [T.free, T.free + 6], [3.2, 1], clamp);
+	const shake = frame >= T.free + 6 && frame < T.free + 16 ? Math.sin(frame * 3) * 8 : 0;
 
 	// phase C: buttons + tapping finger
-	const btn1In = pop(frame, 182, 11);
-	const btn2In = pop(frame, 222, 11);
-	const press1 = frame >= 204 && frame < 212;
-	const press2 = frame >= 248 && frame < 256;
-	const fingerY = interpolate(frame, [190, 204, 230, 248], [1150, 1080, 1080, 1225], clamp);
-	const fingerX = interpolate(frame, [190, 204], [400, 0], clamp);
-	const fingerVisible = frame >= 190 && frame < 266;
+	const btn1In = pop(frame, T.btn1, 11);
+	const btn2In = pop(frame, T.btn2, 11);
+	const press1 = frame >= T.press1 && frame < T.press1 + 7;
+	const press2 = frame >= T.press2 && frame < T.press2 + 7;
+	const fingerY = interpolate(frame, [T.btn1 + 4, T.press1, T.press1 + 7, T.press2], [1150, 1080, 1080, 1225], clamp);
+	const fingerX = interpolate(frame, [T.btn1 + 4, T.press1], [400, 0], clamp);
+	const fingerVisible = frame >= T.btn1 + 4 && frame < T.end;
 
 	// phase D: see you Wednesday
-	const contentOut = interpolate(frame, [266, 276], [1, 0], clamp);
-	const endIn = pop(frame, 272, 10);
-	const endFade = interpolate(frame, [320, 330], [0, 1], clamp);
+	const contentOut = interpolate(frame, [T.end - 4, T.end + 6], [1, 0], clamp);
+	const endIn = pop(frame, T.end, 10);
+	const endFade = interpolate(frame, [len - 10, len], [0, 1], clamp);
 
 	return (
 		<AbsoluteFill style={{background: C.lime}}>
 			{/* phase A */}
-			{frame < 50 ? (
+			{frame < T.card + 2 ? (
 				<AbsoluteFill style={{alignItems: 'center', justifyContent: 'center', opacity: qOut}}>
 					<div
 						style={{
@@ -144,7 +160,7 @@ export const Outro: React.FC = () => {
 			) : null}
 
 			{/* phase B + C */}
-			{frame >= 46 && frame < 276 ? (
+			{frame >= T.card && frame < T.end + 6 ? (
 				<AbsoluteFill style={{alignItems: 'center', opacity: contentOut}}>
 					{/* class card */}
 					<div
@@ -225,7 +241,7 @@ export const Outro: React.FC = () => {
 						</div>
 
 						{/* FREE stamp */}
-						{frame >= 150 ? (
+						{frame >= T.free ? (
 							<div
 								style={{
 									position: 'absolute',
@@ -242,7 +258,7 @@ export const Outro: React.FC = () => {
 									alignItems: 'center',
 									justifyContent: 'center',
 									transform: `scale(${stamp}) rotate(${14 + shake}deg)`,
-									opacity: interpolate(frame, [150, 154], [0, 1], clamp),
+									opacity: interpolate(frame, [T.free, T.free + 3], [0, 1], clamp),
 								}}
 							>
 								<div style={{fontFamily: FONT_TH, fontWeight: 900, fontSize: 92, lineHeight: 1}}>ฟรี!</div>
@@ -278,7 +294,7 @@ export const Outro: React.FC = () => {
 			) : null}
 
 			{/* phase D */}
-			{frame >= 270 ? (
+			{frame >= T.end - 4 ? (
 				<AbsoluteFill style={{alignItems: 'center'}}>
 					<div style={{marginTop: 340, transform: `scale(${endIn})`}}>
 						<Logo scale={0.95} showTagline />
@@ -293,7 +309,7 @@ export const Outro: React.FC = () => {
 							fontSize: 116,
 							lineHeight: 1.2,
 							color: C.black,
-							transform: `scale(${pop(frame, 278, 10)}) rotate(-3deg)`,
+							transform: `scale(${pop(frame, T.end + 6, 10)}) rotate(-3deg)`,
 						}}
 					>
 						เจอกัน
@@ -313,21 +329,26 @@ export const Outro: React.FC = () => {
 					transform: `scale(${endIn})`,
 				}}
 			>
-				{frame >= 270 ? <NongKhai mood="wave" size={300} holdingBag={false} /> : null}
+				{frame >= T.end ? <NongKhai mood="wave" size={300} holdingBag={false} /> : null}
 			</div>
 
-			<Caption
-				y={1440}
-				segments={[
-					{from: 0, to: 46, text: 'ใครอยาก*ปั้นหุ่น*แบบยั่งยืน'},
-					{from: 46, to: 94, text: 'เจอกันใน*คลาสออนไลน์* ผ่าน Zoom'},
-					{from: 94, to: 150, text: '*วันพุธนี้* เวลา *1 ทุ่มตรง!*'},
-					{from: 150, to: 184, text: 'คลาสนี้*ฟรี!*'},
-					{from: 184, to: 226, text: 'รีบ*คลิกลิงก์*ลงทะเบียน'},
-					{from: 226, to: 270, text: 'หรือ*ทักแชต*จองสิทธิ์ด่วน'},
-					{from: 270, to: 330, text: 'แล้วเจอกัน*วันพุธนี้*ครับ!'},
-				]}
-			/>
+			<Caption cues={CAPTIONS.outro} toFrame={t} y={1440} />
+
+			<Sfx at={T.question} name="pop" volume={0.55} />
+			<Sfx at={T.card} name="whoosh" volume={0.5} />
+			<Sfx at={T.card + 3} name="pop" volume={0.5} />
+			<Sfx at={T.day} name="pop" volume={0.55} />
+			<Sfx at={T.time} name="pop" volume={0.55} />
+			<Sfx at={T.time + 4} name="ding" volume={0.35} />
+			<Sfx at={T.free + 5} name="thud" volume={0.7} />
+			<Sfx at={T.free + 6} name="sparkle" volume={0.4} />
+			<Sfx at={T.btn1} name="pop" volume={0.5} />
+			<Sfx at={T.press1} name="click" volume={0.7} />
+			<Sfx at={T.btn2} name="pop" volume={0.5} />
+			<Sfx at={T.press2} name="click" volume={0.7} />
+			<Sfx at={T.end} name="whoosh" volume={0.45} />
+			<Sfx at={T.end + 6} name="boing" volume={0.5} />
+			<Sfx at={T.end + 10} name="ding" volume={0.4} />
 
 			{/* fade to black so the loop back to the Hook is seamless */}
 			<AbsoluteFill style={{background: C.black, opacity: endFade}} />
